@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Phishing Analyzer</title>
+</head>
+<body>
+<h1>Phishing Analyzer</h1>
+<form id="email-form">
+    <label>Sender: <input type="text" name="sender" /></label><br/>
+    <label>Subject: <input type="text" name="subject" /></label><br/>
+    <label>Body:<br/><textarea name="body" rows="6" cols="60"></textarea></label><br/>
+    <button type="submit">Analyze</button>
+</form>
+<pre id="output"></pre>
+<script>
+const form = document.getElementById('email-form');
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    document.getElementById('output').textContent = '';
+    const response = await fetch('/analyze', {
+        method: 'POST',
+        body: new FormData(form)
+    });
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    while (true) {
+        const {value, done} = await reader.read();
+        if (done) break;
+        document.getElementById('output').textContent += decoder.decode(value);
+    }
+});
+</script>
+</body>
+</html>
